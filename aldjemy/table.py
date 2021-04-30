@@ -48,7 +48,13 @@ DATA_TYPES.update(getattr(settings, "ALDJEMY_DATA_TYPES", {}))
 
 
 def get_all_django_models():
-    models = django_apps.get_models()
+    if not hasattr(settings, "ALDJEMY_INSTALLED_APPS"):
+        models = django_apps.get_models()
+    else:
+        models = []
+        for app_label in getattr(settings, "ALDJEMY_INSTALLED_APPS", []):
+            models.extend(django_apps.get_app_config(app_label).get_models())
+
     # Get M2M models
     new_models = []
     for model in models:
